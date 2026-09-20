@@ -468,9 +468,18 @@ function resetProgress(){
   seedIntroduced();
   saveStore();
 }
+/* Written the long way on purpose. Some pass over this file decoded its HTML entities in place,
+   which turned the old one-line table into `"\"":"""` — a syntax error, so app.js never parsed,
+   `store` was never defined and the whole app rendered nothing at all. Building each entity from
+   its character code leaves nothing for a decoder to find. This is the form the sibling copy in
+   yomple/field already uses. */
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, function(c){
-    return ({ "&":"&","<":"<",">":">","\"":""","'":"&#39;" })[c];
+    if (c === "&") return String.fromCharCode(38) + "amp;";
+    if (c === "<") return String.fromCharCode(38) + "lt;";
+    if (c === ">") return String.fromCharCode(38) + "gt;";
+    if (c === '"') return String.fromCharCode(38) + "quot;";
+    return String.fromCharCode(38) + "#39;";
   });
 }
 
